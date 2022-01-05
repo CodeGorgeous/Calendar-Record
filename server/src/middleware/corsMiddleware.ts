@@ -8,8 +8,8 @@ const corsWhiteList: string[] = ['localhost:2551'];
 
 // CORS中间件处理
 @Injectable()
-export default class corsMiddleware implements NestMiddleware {
-  use(req: Request, res: Response, next: NextFunction) {
+export default class CorsMiddleware implements NestMiddleware {
+  public use(req: Request, res: Response, next: NextFunction) {
     if (corsWhiteList.includes(req.headers.host)) {
       next();
     } else {
