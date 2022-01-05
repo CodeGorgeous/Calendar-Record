@@ -2,7 +2,8 @@ import { Controller, Get, Post, Query, Body, Bind } from '@nestjs/common';
 import { UserService } from '../service/user';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
-import { RegisterUser } from '../entities/User';
+import { LoginUser, RegisterUser } from '../entities/User/index';
+import { IResponse } from '../types';
 
 @Controller()
 export class UserController {
@@ -10,25 +11,12 @@ export class UserController {
 
     @Get('/api/login')
     @Bind(Query())
-    private login(data: any): string {
-      console.log('');
-      return this.appService.login();
+    private login(data: any): Promise<IResponse> {
+      return this.appService.login(plainToClass(LoginUser, data));
     }
     @Post('/api/register')
     @Bind(Body())
-    private register(): string {
-      // 平面对象转化为类实例
-      const data = {
-        userName: 'codegorgeous',
-        userPassword: '12312',
-        userEmail: '2460481461@qq.com',
-        verificationCode: ''
-      }
-      const newData = plainToClass(RegisterUser, data as object);
-      console.log(newData);
-      validate(newData).then(error => {
-        console.log(error);
-      })
-      return this.appService.register(newData.userName, newData.userPassword);
+    private register(data: any): Promise<IResponse> {
+      return this.appService.register(plainToClass(RegisterUser, data));
     }
 }
