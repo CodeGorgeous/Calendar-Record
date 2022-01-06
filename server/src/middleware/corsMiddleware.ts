@@ -1,7 +1,7 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
-import createResponse from 'src/utils/createResponse';
-import { EResponseState } from 'src/types';
+import createResponse from '../utils/createResponse';
+import { EResponseState } from '../types';
 
 // CORS白名单
 const corsWhiteList: string[] = ['localhost:2551'];

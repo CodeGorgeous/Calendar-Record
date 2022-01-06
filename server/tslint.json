@@ -4,6 +4,7 @@
         "tslint:recommended"
     ],
     "rules": {
+        "no-var-requires": false,
         "member-access": true,
         "member-ordering": [
             true,

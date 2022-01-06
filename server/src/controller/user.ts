@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Query, Body, Bind } from '@nestjs/common';
 import { UserService } from '../service/user';
 import { plainToClass } from 'class-transformer';
-import { validate } from 'class-validator';
 import { LoginUser, RegisterUser } from '../entities/User/index';
 import { IResponse } from '../types';
 
