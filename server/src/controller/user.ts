@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Query, Body, Bind } from '@nestjs/common';
-import { UserService } from '../service/user';
+import { UserService } from '../service/index';
 import { plainToClass } from 'class-transformer';
 import { LoginUser, RegisterUser } from '../entities/User/index';
 import { IResponse } from '../types';
@@ -10,12 +10,12 @@ export class UserController {
 
     @Get('/api/login')
     @Bind(Query())
-    private login(data: any): Promise<IResponse> {
-      return this.appService.login(plainToClass(LoginUser, data));
+    private async login(data: any): Promise<IResponse> {
+      return await this.appService.login(plainToClass(LoginUser, data));
     }
     @Post('/api/register')
     @Bind(Body())
-    private register(data: any): Promise<IResponse> {
-      return this.appService.register(plainToClass(RegisterUser, data));
+    private async register(data: any): Promise<IResponse> {
+      return await this.appService.register(plainToClass(RegisterUser, data));
     }
 }

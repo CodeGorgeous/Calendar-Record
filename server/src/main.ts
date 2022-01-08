@@ -12,5 +12,5 @@ createConnection().then(async connection => {
   console.log('数据库连接成功');
   bootstrap();
   // 初始化Date表
-  initMysqlDate();
+  // initMysqlDate();
   }).catch(error => console.log(error));
