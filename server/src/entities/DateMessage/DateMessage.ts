@@ -15,4 +15,10 @@ export abstract class DateMessage {
 
     @Column()
     public year: number
+
+    @Column()
+    public month: number
+
+    @Column()
+    public day: number
 }

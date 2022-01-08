@@ -11,3 +11,14 @@ export interface IResponseData {
   prev: UserDateMessage[] | PublicDateMessage[],
   current: UserDateMessage[] | PublicDateMessage[]
 }
+
+export interface IUserRequestData {
+  uid: string
+  month: number
+  day: number
+}
+
+export interface IPublicRequestData {
+  month: number
+  day: number
+}

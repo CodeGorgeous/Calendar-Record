@@ -1,11 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { UserDateMessage, PublicDateMessage } from '../entities/DateMessage/index';
 import createResponse from '../utils/createResponse';
-import { EResponseState, IResponse } from '../types';
+import { EResponseState, IResponse, IUserRequestData, IPublicRequestData } from '../types';
 import validateResponse from '../utils/validateResponse';
 import { getConnection } from 'typeorm';
-import { Date as MDate } from '../entities/Date/Date';
-import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class MessageService {
@@ -24,22 +22,62 @@ export class MessageService {
         }
     }
 
-    /**
-     * TODO:
-     *  返回的信息需要包涵两个时间节点的, 一个是历史上当天的记录, 一个是当天的记录
-     * TODO:
-     *  查询数据的条件: uid, month, day
-     */
-    public async getUserMessage(data: any): Promise<IResponse> {
+    public async getUserMessage(data: IUserRequestData): Promise<IResponse> {
         try {
-            return createResponse(EResponseState.success, '查询成功', {});
+            const manager = getConnection().manager;
+            // 第二步: 根据日期表, uid去UserDateMessage表查询数据
+            const result2 = await manager.find(UserDateMessage, {
+                where: {
+                    uid: data.uid,
+                    month: data.month,
+                    day: data.day
+                },
+                select: ['id', 'message', 'year']
+            });
+            // 第三步: 将拿到的数据进行分类并返回
+            const prev: UserDateMessage[] = [];
+            const current: UserDateMessage[] = [];
+            const year: number = new Date().getFullYear();
+            result2.forEach(item => {
+                if(item.year === year) {
+                    current.push(item);
+                } else {
+                    prev.push(item);
+                }
+            })
+            return createResponse(EResponseState.success, '查询成功', {
+                prev,
+                current
+            });
         } catch (error) {
             return createResponse(EResponseState.error, '未知错误', {});
         }
     }
-    public async getPublicMessage(data: any): Promise<IResponse> {
+
+    public async getPublicMessage(data: IPublicRequestData): Promise<IResponse> {
         try {
-            return createResponse(EResponseState.success, '查询成功', {});
+            const manager = getConnection().manager;
+            const result2 = await manager.find(PublicDateMessage, {
+                where: {
+                    month: data.month,
+                    day: data.day
+                },
+                select: ['id', 'message', 'year']
+            });
+            const prev: PublicDateMessage[] = [];
+            const current: PublicDateMessage[] = [];
+            const year: number = new Date().getFullYear();
+            result2.forEach(item => {
+                if(item.year === year) {
+                    current.push(item);
+                } else {
+                    prev.push(item);
+                }
+            })
+            return createResponse(EResponseState.success, '查询成功', {
+                prev,
+                current
+            });
         } catch (error) {
             return createResponse(EResponseState.error, '未知错误', {});
         }
@@ -54,15 +92,9 @@ async function convenientAddition(data: UserDateMessage | PublicDateMessage): Pr
     const manager = getConnection().manager;
     // 第二步: 将当前时间加入到对象中
     const date = new Date();
-    const dateObj = {
-        month: date.getMonth() + 1,
-        day: date.getDate()
-    }
-    await manager.findOne(MDate, dateObj).then(resp => {
-        const date: any = resp;
-        data.date = date;
-    })
-    data.year = (date.getFullYear());
+    data.year = date.getFullYear();
+    data.month = date.getMonth() + 1;
+    data.day = date.getDate();
     // 第三步: 数据添加入数据库
     return await manager.save(data).then(() => {
         return createResponse(EResponseState.success, '添加信息成功', {});
@@ -70,5 +102,3 @@ async function convenientAddition(data: UserDateMessage | PublicDateMessage): Pr
         return createResponse(EResponseState.fail, '添加信息失败', {});
     })
 }
-
-async function convenientQuery() {}
